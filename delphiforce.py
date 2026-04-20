@@ -49,30 +49,56 @@ COL_SPECS = [(0,3),(4,5),(6,10),(18,25),(28,35),(38,45),(48,55),(58,65)] # fixed
 COL_NAMES = ["Residue","Chain","ID","Net_Charge","G","Fx","Fy","Fz"] # column names for DataFrame
 
 # Note: The following code block is commented out because it only needs to be run once to create the CSV
-# filelist = [f for f in os.listdir(FILE_DIR) if f.endswith(".residue")]
-# print(f"Found {len(filelist)} files")
-# all_data_df = []
-# for file_name in filelist:
-#     geno_raw, sim, frame = re.match(r"([^_]+)_sim(\d+)_frame(\d+)", file_name).groups()
-#     df = pd.read_fwf(
-#         os.path.join(FILE_DIR, file_name),
-#         colspecs   = COL_SPECS,
-#         names      = COL_NAMES,
-#         skiprows   = 1,
-#         skipfooter = 2,
-#         engine     = "python"
-#     )
-#     df["Residue_ID"] = df["ID"].astype(int).astype(str) + "_" + df["Residue"]
-#     df["Genotype"]   = GENOTYPE_MAP.get(geno_raw.lower(), "ERROR")
-#     df["sim"]        = int(sim)
-#     df["frame"]      = int(frame)
-#     df["file_name"]  = file_name
-#     all_data_df.append(df)
-# df = pd.concat(all_data_df, ignore_index=True)
-# df["Genotype"] = pd.Categorical(df["Genotype"], categories=GENOTYPE_ORDER, ordered=True)
-# df = df.sort_values("frame").reset_index(drop=True)
-# df.to_csv(OUT_CSV, index=False)
-# print(f"Saved → {OUT_CSV}")
+filelist = [f for f in os.listdir(FILE_DIR) if f.endswith(".residue")]
+print(f"Found {len(filelist)} files")
+all_data_df = []
+problematic_files = []
+
+for file_name in filelist:
+    try:
+        geno_raw, sim, frame = re.match(r"([^_]+)_sim(\d+)_frame(\d+)", file_name).groups()
+        df = pd.read_fwf(
+            os.path.join(FILE_DIR, file_name),
+            colspecs   = COL_SPECS,
+            names      = COL_NAMES,
+            skiprows   = 1,
+            skipfooter = 2,
+            engine     = "python"
+        )
+        
+        # Convert ID to numeric, turning errors into NaN
+        df["ID"] = pd.to_numeric(df["ID"], errors="coerce")
+        
+        # Drop rows where ID conversion failed (contains NaN)
+        n_before = len(df)
+        df = df.dropna(subset=["ID"])
+        n_dropped = n_before - len(df)
+        
+        if n_dropped > 0:
+            problematic_files.append((file_name, n_dropped))
+        
+        # Now safe to convert to int
+        df["ID"] = df["ID"].astype(int)
+        df["Residue_ID"] = df["ID"].astype(str) + "_" + df["Residue"]
+        df["Genotype"]   = GENOTYPE_MAP.get(geno_raw.lower(), "ERROR")
+        df["sim"]        = int(sim)
+        df["frame"]      = int(frame)
+        df["file_name"]  = file_name
+        all_data_df.append(df)
+    except Exception as e:
+        print(f"Error processing {file_name}: {e}")
+        continue
+
+df = pd.concat(all_data_df, ignore_index=True)
+df["Genotype"] = pd.Categorical(df["Genotype"], categories=GENOTYPE_ORDER, ordered=True)
+df = df.sort_values("frame").reset_index(drop=True)
+df.to_csv(OUT_CSV, index=False)
+print(f"Saved → {OUT_CSV}")
+print(f"\nFiles with problematic rows: {len(problematic_files)}")
+if problematic_files:
+    print("Details:")
+    for fname, n_dropped in problematic_files[:10]:  # Show first 10
+        print(f"  {fname}: dropped {n_dropped} rows")
 
 # ================================================================
 # Load CSV into DataFrame
