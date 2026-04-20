@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patch
 import seaborn as sns
 from scipy import stats
+import pickle
 
 # ================================================================
 # File paths
@@ -43,63 +44,70 @@ DOMAIN_LABELS = {
 # ================================================================
 # Read all data and save to CSV
 # ================================================================
-GENOTYPE_MAP = {"wt": "WT", "k637e": "K637E", "d239n": "D239N"}  # Map raw genotype strings to standardized labels
+GENOTYPE_MAP = {"wt": "WT", "k637e": "K637E", "d239n": "D239N"}
 
-COL_SPECS = [(0,3),(4,5),(6,10),(18,25),(28,35),(38,45),(48,55),(58,65)] # fixed-width column specs based on sample file
-COL_NAMES = ["Residue","Chain","ID","Net_Charge","G","Fx","Fy","Fz"] # column names for DataFrame
+COL_SPECS = [(0,3),(4,5),(6,10),(18,25),(28,35),(38,45),(48,55),(58,65)]
+COL_NAMES = ["Residue","Chain","ID","Net_Charge","G","Fx","Fy","Fz"]
 
-# Note: The following code block is commented out because it only needs to be run once to create the CSV
-filelist = [f for f in os.listdir(FILE_DIR) if f.endswith(".residue")]
-print(f"Found {len(filelist)} files")
-all_data_df = []
-problematic_files = []
+# # UNCOMMENT THIS ENTIRE SECTION TO RE-READ RAW FILES
+# filelist = [f for f in os.listdir(FILE_DIR) if f.endswith(".residue")]
+# print(f"Found {len(filelist)} files")
+# all_data_df = []
+# files_with_issues = []
 
-for file_name in filelist:
-    try:
-        geno_raw, sim, frame = re.match(r"([^_]+)_sim(\d+)_frame(\d+)", file_name).groups()
-        df = pd.read_fwf(
-            os.path.join(FILE_DIR, file_name),
-            colspecs   = COL_SPECS,
-            names      = COL_NAMES,
-            skiprows   = 1,
-            skipfooter = 2,
-            engine     = "python"
-        )
-        
-        # Convert ID to numeric, turning errors into NaN
-        df["ID"] = pd.to_numeric(df["ID"], errors="coerce")
-        
-        # Drop rows where ID conversion failed (contains NaN)
-        n_before = len(df)
-        df = df.dropna(subset=["ID"])
-        n_dropped = n_before - len(df)
-        
-        if n_dropped > 0:
-            problematic_files.append((file_name, n_dropped))
-        
-        # Now safe to convert to int
-        df["ID"] = df["ID"].astype(int)
-        df["Residue_ID"] = df["ID"].astype(str) + "_" + df["Residue"]
-        df["Genotype"]   = GENOTYPE_MAP.get(geno_raw.lower(), "ERROR")
-        df["sim"]        = int(sim)
-        df["frame"]      = int(frame)
-        df["file_name"]  = file_name
-        all_data_df.append(df)
-    except Exception as e:
-        print(f"Error processing {file_name}: {e}")
-        continue
+# for file_name in filelist:
+#     geno_raw, sim, frame = re.match(r"([^_]+)_sim(\d+)_frame(\d+)", file_name).groups()
+    
+#     df = pd.read_fwf(
+#         os.path.join(FILE_DIR, file_name),
+#         colspecs   = COL_SPECS,
+#         names      = COL_NAMES,
+#         skiprows   = 1,
+#         skipfooter = 2,      # Only skip last 2 lines, like R
+#         engine     = "python"
+#     )
+    
+#     n_before = len(df)
+    
+#     # Convert ID to numeric, turning errors into NaN (like R's as.integer)
+#     df["ID"] = pd.to_numeric(df["ID"], errors="coerce")
+    
+#     # Drop rows where ID is NaN (matches R filtering out NA values)
+#     df = df.dropna(subset=["ID"])
+    
+#     n_after = len(df)
+#     n_dropped = n_before - n_after
+    
+#     if n_dropped > 0:
+#         files_with_issues.append((file_name, n_before, n_after, n_dropped))
+    
+#     # Now safe to convert to int
+#     df["ID"] = df["ID"].astype(int)
+    
+#     df["Residue_ID"] = df["ID"].astype(str) + "_" + df["Residue"]
+#     df["Genotype"]   = GENOTYPE_MAP.get(geno_raw.lower(), "ERROR")
+#     df["sim"]        = int(sim)
+#     df["frame"]      = int(frame)
+#     df["file_name"]  = file_name
+#     all_data_df.append(df)
 
-df = pd.concat(all_data_df, ignore_index=True)
-df["Genotype"] = pd.Categorical(df["Genotype"], categories=GENOTYPE_ORDER, ordered=True)
-df = df.sort_values("frame").reset_index(drop=True)
-df.to_csv(OUT_CSV, index=False)
-print(f"Saved → {OUT_CSV}")
-print(f"\nFiles with problematic rows: {len(problematic_files)}")
-if problematic_files:
-    print("Details:")
-    for fname, n_dropped in problematic_files[:10]:  # Show first 10
-        print(f"  {fname}: dropped {n_dropped} rows")
+# df = pd.concat(all_data_df, ignore_index=True)
+# df["Genotype"] = pd.Categorical(df["Genotype"], categories=GENOTYPE_ORDER, ordered=True)
+# df = df.sort_values("frame").reset_index(drop=True)
+# df.to_csv(OUT_CSV, index=False)
+# print(f"Saved → {OUT_CSV}")
 
+# # Report files with issues
+# print(f"\n{'='*70}")
+# print(f"Files with problematic rows: {len(files_with_issues)}")
+# if files_with_issues:
+#     print(f"{'='*70}")
+#     print(f"{'File Name':<50} {'Before':<8} {'After':<8} {'Dropped':<8}")
+#     print(f"{'-'*70}")
+#     for fname, before, after, dropped in files_with_issues:
+#         print(f"{fname:<50} {before:<8} {after:<8} {dropped:<8}")
+#     print(f"{'='*70}")
+    
 # ================================================================
 # Load CSV into DataFrame
 # ================================================================
@@ -112,7 +120,6 @@ for col in ["ID", "Net_Charge", "G", "Fx", "Fy", "Fz"]: # Convert to numeric, co
 n_before = len(df)
 df = df.dropna(subset=["ID", "G"])
 df["ID"] = df["ID"].astype(int) # Ensure ID is integer after dropping NaNs (some rows may have had non-numeric IDs that became NaN)
-print(f"Dropped {n_before - len(df):,} malformed rows ({len(df):,} remaining)")
 
 # ================================================================
 # Sanity check
@@ -593,6 +600,18 @@ for domain_name, domain_ranges in DOMAIN_LABELS.items():
     plot_domain(domain_name, domain_ranges)
 
 # Overview plots using G threshold + ANOVA stars
-print("\nPlotting overview figures with G threshold + ANOVA stars...")
+print("\nPlotting overview figures with Important Residues + ANOVA stars...")
 plot_all_significant()
 plot_pct_change()
+
+# Save processed data for potential future use
+print("\nSaving processed data to pickle for future use...")
+processed_data_path = os.path.join(FIGURES_DIR, "processed_data.pkl")
+with open(processed_data_path, "wb") as f:
+    pickle.dump({
+        "df": df,
+        "df_avg_sim": df_avg_sim,
+        "df_important_g": df_important_g,
+        "df_important_avgGt_g": df_important_avgGt_g,
+        "anova_all": anova_all
+    }, f)
