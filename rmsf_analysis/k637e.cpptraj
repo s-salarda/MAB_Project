@@ -1,0 +1,71 @@
+# =============================================================================
+# CPPTRAJ Script: k637e
+# =============================================================================
+# USAGE: cpptraj -i k637e.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_1_500ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_1_500ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_1_500ns_1000ps.pdb [first_ref]
+
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align1 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg1
+run
+rmsd average1 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg1
+resinfo :1-853 out k637e1_residue_info.dat
+atomicfluct out k637e1_rmsf.dat :1-9999 byres pdbres
+go
+
+# =============================================================================
+# CPPTRAJ Script: k637e
+# =============================================================================
+# USAGE: cpptraj -i k637e.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_2_500ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_2_500ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_2_500ns_1000ps.pdb [first_ref]
+
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align2 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg2
+run
+rmsd average2 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg2
+resinfo :1-853 out k637e2_residue_info.dat
+atomicfluct out k637e2_rmsf.dat :1-9999 byres pdbres
+go
+
+# =============================================================================
+# CPPTRAJ Script: k637e
+# =============================================================================
+# USAGE: cpptraj -i k637e.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_3_500ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_3_500ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_k637e_3_500ns_1000ps.pdb [first_ref]
+
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align3 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg3
+run
+rmsd average3 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg3
+resinfo :1-853 out k637e3_residue_info.dat
+atomicfluct out k637e3_rmsf.dat :1-9999 byres pdbres
+go

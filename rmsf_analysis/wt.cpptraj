@@ -1,0 +1,77 @@
+# =============================================================================
+# CPPTRAJ Script: WT
+# =============================================================================
+# USAGE: cpptraj -i wt.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_1_2000ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_1_2000ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_1_2000ns_1000ps.pdb [first_ref]
+
+# Strip solvent/ions to speed processing
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align1 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg1
+run
+rmsd average1 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg1
+# resinfo :1-853 out wt1_residue_info.dat
+atomicfluct out wt1_rmsf.dat :1-9999 byres pdbres
+go
+
+# =============================================================================
+# CPPTRAJ Script: WT
+# =============================================================================
+# USAGE: cpptraj -i wt.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_2_2000ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_2_2000ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_2_2000ns_1000ps.pdb [first_ref]
+
+# Strip solvent/ions to speed processing
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align2 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg2
+run
+rmsd average2 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg2
+# resinfo :1-853 out wt2_residue_info.dat
+atomicfluct out wt2_rmsf.dat :1-9999 byres pdbres
+go
+
+# =============================================================================
+# CPPTRAJ Script: WT
+# =============================================================================
+# USAGE: cpptraj -i wt.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_3_2000ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_3_2000ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_wt_3_2000ns_1000ps.pdb [first_ref]
+
+# Strip solvent/ions to speed processing
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+# Aligning rmsd Sim
+rmsd align3 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg3
+run
+# Aligning to avg
+rmsd average3 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg3
+# Prints out that dat file comparison... makes sure that residues start at the same numebr.. see amber changes
+# resinfo :1-99 out wt3_residue_info.dat
+atomicfluct out wt3_rmsf.dat :1-9999 byres pdbres
+go

@@ -1,0 +1,71 @@
+# =============================================================================
+# CPPTRAJ Script: d239n
+# =============================================================================
+# USAGE: cpptraj -i d239n.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_1_500ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_1_500ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_1_500ns_1000ps.pdb [first_ref]
+
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align1 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg1
+run
+rmsd average1 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg1
+resinfo :1-853 out d239n1_residue_info.dat
+atomicfluct out d239n1_rmsf.dat :1-9999 byres pdbres
+go
+
+# =============================================================================
+# CPPTRAJ Script: d239n
+# =============================================================================
+# USAGE: cpptraj -i d239n.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_2_500ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_2_500ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_2_500ns_1000ps.pdb [first_ref]
+
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align2 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg2
+run
+rmsd average2 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg2
+resinfo :1-853 out d239n2_residue_info.dat
+atomicfluct out d239n2_rmsf.dat :1-9999 byres pdbres
+go
+
+# =============================================================================
+# CPPTRAJ Script: d239n
+# =============================================================================
+# USAGE: cpptraj -i d239n.cpptraj
+# =============================================================================
+
+parm      /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_3_500ns_1000ps.pdb
+trajin    /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_3_500ns_1000ps.dcd 1 500 1
+
+reference /mnt/d/Projects/MAB_project/Simulations/ChimeraX/1.m.adp.pi_d239n_3_500ns_1000ps.pdb [first_ref]
+
+strip :WAT,Na+,Cl-,Mg2+
+
+# -----------------------------------------------------------------------
+# Per-residue RMSF (flexibility profile along the helix)
+# -----------------------------------------------------------------------
+rmsd align3 @CA&:215-231,266-453,604-621,645-665,472-590 ref [first_ref]
+average crdset MyAvg3
+run
+rmsd average3 @CA&:215-231,266-453,604-621,645-665,472-590 ref MyAvg3
+resinfo :1-853 out d239n3_residue_info.dat
+atomicfluct out d239n3_rmsf.dat :1-9999 byres pdbres
+go

@@ -1,0 +1,37 @@
+# Distance Pairs
+
+# Affects of the Nucleotide pocket and ADP
+ADP_SH1        :852        :674-685
+ADP_S1         :852        :232-244
+ADP_Ploop      :852        :179-184
+ADP_Purine     :852        :126-131
+
+# P Loop and Phosphates
+Ploop_Pi        :179-183     :853@P
+
+
+# Switch 1 coupling
+S1_SH1         :232-244    :674-685
+S1_U50         :232-244    :271-324
+S1_L50         :232-244    :557-590, 645-655
+S1_Ohelix      :232-244    :417-447
+S1_Relay       :232-244    :479-503
+
+# Inner + outer cleft reshaping
+S1_S2          :232-244    :462-472
+U50_L50        :215-231,266-453,604-621    :645-665,472-590
+HLH_L2         :520-556    :621-646
+L3_L2          :567-577    :621-646
+Ohelix_Relay   :417-447    :479-503
+
+# Residue to Residue
+239_320 :239 :320
+239_321 :239 :321
+239_323 :239 :323
+239_679 :239 :679
+
+# Phosphate Backdoor
+237_459 :237 :466
+237_Pi	:237 :853
+466_Pi	:466 :853
+468_475 :468 :475
